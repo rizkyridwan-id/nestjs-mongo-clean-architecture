@@ -6,6 +6,8 @@ import { resolve } from 'path';
 import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
 import helmet from 'helmet';
 import * as ip from 'ip';
+import { CustomLogger } from './core/logger/logger';
+import { AllExceptionFilter } from './core/base-class/base-exception.filter';
 
 async function bootstrap() {
   const httpsMode = !!Number(process.env.HTTPS_MODE);
@@ -14,11 +16,13 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule, {
     ...secureOptions,
+    logger: new CustomLogger(),
     cors: true, // change this to Client Server when Production
   });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   app.setGlobalPrefix('api');
+  app.useGlobalFilters(new AllExceptionFilter());
 
   app.use(helmet());
 
