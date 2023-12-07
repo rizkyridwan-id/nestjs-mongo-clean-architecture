@@ -4,7 +4,7 @@ import {
   ExceptionFilter,
   HttpException,
 } from '@nestjs/common';
-import { CustomLogger } from '../logger/logger';
+import { CustomLogger } from '../../infra/logger/logger';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {

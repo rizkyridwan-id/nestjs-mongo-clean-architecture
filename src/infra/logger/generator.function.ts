@@ -1,4 +1,4 @@
-import { ColorLevel } from '../constant/logger/color.const';
+import { ColorLevel } from '../../core/constant/logger/color.const';
 import chalk from 'chalk';
 
 export function generateColor(level: string) {

@@ -6,7 +6,7 @@ import { resolve } from 'path';
 import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
 import helmet from 'helmet';
 import * as ip from 'ip';
-import { CustomLogger } from './core/logger/logger';
+import { CustomLogger } from './infra/logger/logger';
 import { AllExceptionFilter } from './core/base-class/base-exception.filter';
 
 async function bootstrap() {
