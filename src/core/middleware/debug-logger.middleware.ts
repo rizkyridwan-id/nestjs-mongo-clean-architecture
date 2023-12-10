@@ -15,7 +15,7 @@ export class DebugLoggerMiddleware implements NestMiddleware {
     const query = req.query;
 
     if ((process.env.MODE = 'DEVELOPMENT')) {
-      this.logger.debug('API: ' + req.baseUrl + ' called.');
+      this.logger.debug(req.baseUrl + ' called.', req.method);
       if (Object.keys(body).length) {
         this.logger.debug('Body:' + JSON.stringify(body, null, 2));
       }

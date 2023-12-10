@@ -1,5 +1,5 @@
 import { Controller, Get, HttpStatus } from '@nestjs/common';
-import { ResponseDto } from 'src/core/base-class/response.dto.base';
+import { ResponseDto } from 'src/core/base/http/response.dto.base';
 
 @Controller('status')
 export class StatusController {

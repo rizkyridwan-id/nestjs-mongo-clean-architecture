@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { NextFunction } from 'connect';
 import { Request } from 'express';
-import { SignatureService } from '../helper/modules/signature.service';
+import { SignatureService } from '../helper/module/signature.service';
 @Injectable()
 export class SignatureMiddleware implements NestMiddleware {
   constructor(readonly signatureService: SignatureService) {}

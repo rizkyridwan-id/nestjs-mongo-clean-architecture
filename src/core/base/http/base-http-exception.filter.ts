@@ -4,7 +4,7 @@ import {
   ExceptionFilter,
   HttpException,
 } from '@nestjs/common';
-import { CustomLogger } from '../../infra/logger/logger';
+import { CustomLogger } from '../../../infra/logger/logger';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
@@ -13,11 +13,8 @@ export class AllExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse();
     const request = ctx.getRequest();
 
-    let status = 500;
+    const status = this._getErrorStatus(exception);
     const message = this._getErrorMessage(exception);
-    if (exception instanceof HttpException) {
-      status = exception.getStatus();
-    }
 
     const messageValue: string =
       typeof message !== 'string' ? message.message : message;
@@ -34,6 +31,14 @@ export class AllExceptionFilter implements ExceptionFilter {
     };
 
     response.status(status).json(responseJson);
+  }
+
+  private _getErrorStatus(exception: unknown) {
+    if (exception instanceof HttpException) {
+      return exception.getStatus() || 500;
+    } else {
+      return 500;
+    }
   }
 
   private _getErrorMessage(exception: unknown): string | { message: string } {

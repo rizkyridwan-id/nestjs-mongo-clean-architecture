@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MD5 } from 'crypto-js';
+import { SHA256 } from 'crypto-js';
 import { EnvService } from '../../../infra/config/env.service';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class SignatureService {
     timestamp: string,
   ) {
     const payload = apiKey + secretKey + accessToken + timestamp;
-    return MD5(payload).toString();
+    return SHA256(payload).toString();
   }
 
   validateSignature(
