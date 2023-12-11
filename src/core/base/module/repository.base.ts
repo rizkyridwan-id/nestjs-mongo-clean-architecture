@@ -21,8 +21,8 @@ import { DbMapper } from '../domain/db-mapper';
 import { TypeValidator } from '../../logic/type-validator';
 
 @Injectable()
-export class BaseRepository<MongoEntity, Entity>
-  implements BaseRepositoryPort<MongoEntity, Entity>
+export class BaseRepository<Entity, MongoEntity>
+  implements BaseRepositoryPort<Entity, MongoEntity>
 {
   constructor(
     private readonly genericModel: Model<MongoEntity>,

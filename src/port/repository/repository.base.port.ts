@@ -8,7 +8,7 @@ import {
 import { IPaginationMeta } from '../interface/pagination-meta.interface';
 import { IRepositoryResponse } from '../interface/repository-response.interface';
 
-export interface BaseRepositoryPort<MongoEntity, Entity> {
+export interface BaseRepositoryPort<Entity, MongoEntity> {
   findAll(session?: ClientSession): Promise<Array<MongoEntity>>;
   findOne(
     identifier: FilterQuery<MongoEntity>,

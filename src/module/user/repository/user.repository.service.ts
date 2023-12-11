@@ -11,7 +11,7 @@ import { BaseRepository } from 'src/core/base/module/repository.base';
 
 @Injectable()
 export class UserRepository
-  extends BaseRepository<UserMongoEntity, UserEntity>
+  extends BaseRepository<UserEntity, UserMongoEntity>
   implements UserRepositoryPort
 {
   constructor(
