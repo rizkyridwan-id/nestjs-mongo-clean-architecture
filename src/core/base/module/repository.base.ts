@@ -39,7 +39,7 @@ export class BaseRepository<Entity, MongoEntity>
     session?: ClientSession,
   ): Promise<MongoEntity> {
     const result = await this.genericModel.findOne(identifier).session(session);
-    return result.toObject();
+    return result?.toObject();
   }
 
   async findOneOrThrow(
@@ -69,7 +69,7 @@ export class BaseRepository<Entity, MongoEntity>
               .toUpperCase()} NOT FOUND`,
       );
     }
-    return foundData.toObject();
+    return foundData?.toObject();
   }
 
   async findOneAndThrow(
@@ -107,13 +107,13 @@ export class BaseRepository<Entity, MongoEntity>
       .sort({ _id: -1 })
       .session(session);
 
-    return result.toObject();
+    return result?.toObject();
   }
 
   async findById(id: string, session?: ClientSession): Promise<MongoEntity> {
     this._validateMongoID(id);
     const result = await this.genericModel.findById(id).session(session);
-    return result.toObject();
+    return result?.toObject();
   }
 
   async findBy(
@@ -181,7 +181,7 @@ export class BaseRepository<Entity, MongoEntity>
     const mongoEntity = this.mapper.toMongoEntity(entity);
     const newModel = new this.genericModel(mongoEntity);
     const result = await newModel.save({ session });
-    return result;
+    return result?.toObject();
   }
   async saveMany(entities: Entity[], session?: ClientSession) {
     const mongoEntities = entities.map((entity) =>
