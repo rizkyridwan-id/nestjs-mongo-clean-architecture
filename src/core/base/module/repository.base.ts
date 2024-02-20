@@ -12,6 +12,7 @@ import {
   isValidObjectId,
   Model,
   SortOrder,
+  Types,
   UpdateQuery,
 } from 'mongoose';
 import { IRepositoryResponse } from '../../../port/interface/repository-response.interface';
@@ -171,7 +172,7 @@ export class BaseRepository<Entity, MongoEntity>
     const newModel = new this.genericModel(mongoEntity);
     const result = await newModel.save({ session });
     return {
-      _id: result._id as string,
+      _id: result._id as Types.ObjectId,
     };
   }
   async saveReturnDocument(
@@ -202,7 +203,8 @@ export class BaseRepository<Entity, MongoEntity>
     data: UpdateQuery<Partial<MongoEntity>>,
     session?: ClientSession,
   ): Promise<IRepositoryResponse> {
-    if (identifier._id) this._validateMongoID(identifier._id);
+    if (identifier._id && typeof identifier._id === 'string')
+      this._validateMongoID(identifier._id);
 
     const { matchedCount, modifiedCount } = await this.genericModel.updateMany(
       identifier,
@@ -295,7 +297,8 @@ export class BaseRepository<Entity, MongoEntity>
     data: UpdateQuery<Partial<MongoEntity>>,
     session?: ClientSession,
   ): Promise<IRepositoryResponse> {
-    if (identifier._id) this._validateMongoID(identifier._id);
+    if (identifier._id && typeof identifier._id === 'string')
+      this._validateMongoID(identifier._id);
 
     const { matchedCount: n } = await this.genericModel.updateMany(
       identifier,
