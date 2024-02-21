@@ -8,6 +8,7 @@ I've compiled best practices from various articles in this **repository**. While
 
 [Packages](#packages)
 * [Nest JS](#nest-js)
+* [Fastify](#fastify)
 * [Mongoose](#mongoose)
 * [Passport](#passport)
 * [Class Validator](#class-validator)
@@ -47,6 +48,8 @@ This repository leverages NestJS as the core framework and Mongoose for MongoDB 
 There are 5 Main Packages used in this repo:
 * ### Nest JS
 	NestJS is a Node.js framework that offers built-in support for TypeScript. As a strong advocate for TypeScript's type system, I appreciate this feature greatly.
+* ### Fastify
+    Fastify is a web framework highly focused on providing the best developer experience with the least overhead and a powerful plugin architecture. It is inspired by Hapi and Express and as far as we know, it is one of the fastest web frameworks in town.
 * ### Mongoose
 	Mongoose is a user-friendly MongoDB framework that simplifies common tasks, including connection management, data modeling, and schema validation.
 * ### Passport

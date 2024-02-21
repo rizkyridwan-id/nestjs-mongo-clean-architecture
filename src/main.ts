@@ -4,36 +4,49 @@ import { AppModule } from './app.module';
 import * as fs from 'fs';
 import { resolve } from 'path';
 import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
-import helmet from 'helmet';
 import * as ip from 'ip';
 import { CustomLogger } from './infra/logger/logger';
 import { AllExceptionFilter } from './core/base/http/base-http-exception.filter';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
+import fastifyCsrf from '@fastify/csrf-protection';
+import fastifyHelmet from '@fastify/helmet';
+import { DebugLoggerInterceptor } from './core/interceptor/debug-logger.interceptor';
 
 async function bootstrap() {
   const httpsMode = !!Number(process.env.HTTPS_MODE);
   const secureOptions: NestApplicationOptions =
     generateHttpsModeOption(httpsMode);
 
-  const app = await NestFactory.create(AppModule, {
-    ...secureOptions,
-    logger: new CustomLogger(),
-    cors: true, // change this to Client IP when Production
-  });
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter(),
+    {
+      ...secureOptions,
+      logger: new CustomLogger(),
+      cors: true, // change this to Client IP when Production
+    },
+  );
+
+  await app.register(fastifyCsrf);
+  await app.register(fastifyHelmet);
+
+  app.setGlobalPrefix('api');
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
-  app.setGlobalPrefix('api');
+  app.useGlobalInterceptors(new DebugLoggerInterceptor());
   app.useGlobalFilters(new AllExceptionFilter());
-
-  app.use(helmet());
 
   const port = process.env.PORT;
   const host = '0.0.0.0';
   const logger = new Logger('NestBoilerplate');
 
-  await app.listen(process.env.PORT, host, () => {
+  await app.listen(port, host, () => {
     logger.log(`Application Started at port: ${port}, httpsMode: ${httpsMode}`);
     if (process.env.MODE == 'DEVELOPMENT')
-      logger.log(`Current IP: ${ip.address()}`);
+      logger.log(`Current Local IP: ${ip.address()}`);
   });
 }
 

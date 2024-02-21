@@ -7,7 +7,6 @@ import { InjectUserRepository } from '../repository/user.repository.provider';
 
 import { BaseUseCase, IUseCase } from 'src/core/base/module/use-case.base';
 import { ResponseDto } from 'src/core/base/http/response.dto.base';
-import { TransactionService } from 'src/core/helper/module/transaction/transaction.service';
 
 import { PickUseCasePayload } from 'src/core/base/types/pick-use-case-payload.type';
 

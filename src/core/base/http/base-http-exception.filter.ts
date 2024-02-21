@@ -5,13 +5,14 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { CustomLogger } from '../../../infra/logger/logger';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse();
-    const request = ctx.getRequest();
+    const response = ctx.getResponse<FastifyReply>();
+    const request = ctx.getRequest<FastifyRequest>();
 
     const status = this._getErrorStatus(exception);
     const message = this._getErrorMessage(exception);
@@ -19,7 +20,7 @@ export class AllExceptionFilter implements ExceptionFilter {
     const messageValue: string =
       typeof message !== 'string' ? message.message : message;
 
-    const logger = new CustomLogger('HF');
+    const logger = new CustomLogger('E_FILTER');
     logger.error(
       messageValue,
       `(${request.method})${request.url.replace(/^\/api/, '')}`,
@@ -30,7 +31,7 @@ export class AllExceptionFilter implements ExceptionFilter {
       message: messageValue,
     };
 
-    response.status(status).json(responseJson);
+    response.status(status).send(responseJson);
   }
 
   private _getErrorStatus(exception: unknown) {
