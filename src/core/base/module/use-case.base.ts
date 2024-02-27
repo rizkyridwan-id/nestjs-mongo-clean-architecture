@@ -12,7 +12,7 @@ export interface IUseCasePayload<T> {
 }
 
 export interface IUseCase<IReq> {
-  execute(request?: IUseCasePayload<IReq>);
+  execute(request?: IReq);
 }
 
 @Injectable()

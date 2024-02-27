@@ -1,18 +1,21 @@
 import { SortOrder } from 'mongoose';
-import { IsOptionalSortBy } from 'src/core/decorator/optional-sort-by.decorated';
-import { IsStringNumber } from 'src/core/decorator/optional-string-number.decorator';
-import { IsOptionalString } from 'src/core/decorator/optional-string.decorator';
+import * as z from 'zod';
 
-export class GetPaginationDto {
-  @IsStringNumber()
-  skip: number;
+export type GetPaginationDto = z.infer<typeof GetPaginationDto> & {
+  sort_by?: SortOrder;
+};
 
-  @IsStringNumber()
-  limit: number;
-
-  @IsOptionalSortBy()
-  sort_by?: { [key: string]: SortOrder };
-
-  @IsOptionalString()
-  first: string;
-}
+export const GetPaginationDto = z.object({
+  skip: z
+    .string()
+    .regex(/\d+/, { message: 'Format skip tidak valid' })
+    .optional(),
+  limit: z
+    .string()
+    .regex(/\d+/, { message: 'Format limit tidak valid' })
+    .optional(),
+  first: z.enum(['true', 'false']).optional(),
+  sort_by: z
+    .record(z.enum(['asc', 'ascending', 'desc', 'descending']))
+    .optional(),
+});

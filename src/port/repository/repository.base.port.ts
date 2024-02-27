@@ -13,7 +13,7 @@ export interface BaseRepositoryPort<Entity, MongoEntity> {
   findOne(
     identifier: FilterQuery<MongoEntity>,
     session?: ClientSession,
-  ): Promise<MongoEntity>;
+  ): Promise<MongoEntity | undefined>;
 
   findOneOrThrow(
     identifier: FilterQuery<MongoEntity>,
@@ -35,8 +35,11 @@ export interface BaseRepositoryPort<Entity, MongoEntity> {
   findOneLatest(
     identifier: FilterQuery<MongoEntity>,
     session?: ClientSession,
-  ): Promise<MongoEntity>;
-  findById(id: string, session?: ClientSession): Promise<MongoEntity>;
+  ): Promise<MongoEntity | undefined>;
+  findById(
+    id: string,
+    session?: ClientSession,
+  ): Promise<MongoEntity | undefined>;
   findBy(
     identifier: FilterQuery<MongoEntity>,
     session?: ClientSession,
@@ -48,7 +51,7 @@ export interface BaseRepositoryPort<Entity, MongoEntity> {
   findByPaginateSorted(
     identifier: FilterQuery<MongoEntity>,
     paginationMeta: IPaginationMeta,
-    sort: Partial<Record<keyof MongoEntity, SortOrder>>,
+    sort: { [key: string]: SortOrder | { $meta: any } },
   ): Promise<Array<MongoEntity>>;
   count(): Promise<number>;
   countBy(identifier: FilterQuery<MongoEntity>): Promise<number>;

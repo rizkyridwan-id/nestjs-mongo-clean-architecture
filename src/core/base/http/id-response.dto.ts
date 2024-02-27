@@ -1,6 +1,6 @@
 import { IId } from 'src/port/interface/id.interface';
 
-export class IdResponseDTO implements IId {
+export class IdResponseDto implements IId {
   constructor(id: string) {
     this._id = id;
   }

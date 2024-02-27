@@ -7,7 +7,7 @@ export interface UserProps {
   user_name: string;
   password: string;
   level: UserLevel;
-  input_by: string;
+  input_by?: string;
 }
 
 export class UserEntity extends Entity<UserProps> {

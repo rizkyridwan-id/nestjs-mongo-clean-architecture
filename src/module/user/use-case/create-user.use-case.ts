@@ -24,7 +24,7 @@ type TCreateUserPayload = PickUseCasePayload<
 @Injectable()
 export class CreateUser
   extends BaseUseCase
-  implements IUseCase<CraeteUserRequestDto>
+  implements IUseCase<TCreateUserPayload>
 {
   constructor(
     @InjectUserRepository private userRepository: UserRepositoryPort,
@@ -66,7 +66,7 @@ export class CreateUser
     }
   }
 
-  private async _validateSecretKey(secretKey: string) {
+  private async _validateSecretKey(secretKey?: string): Promise<boolean> {
     const systemSecretKey = SHA256(
       this.envService.variables.secretKey,
     ).toString();
@@ -75,9 +75,9 @@ export class CreateUser
     if (secretKey && !isSecretKeyValid)
       throw new BadRequestException('Wrong Key Input. Transaction aborted.');
 
-    return isSecretKeyValid;
+    return isSecretKeyValid || false;
   }
-  private async _generateUserLevel(isSecretKeyValid: boolean, level: string) {
+  private async _generateUserLevel(isSecretKeyValid: boolean, level?: string) {
     if (isSecretKeyValid)
       await this.userRepository.findOneAndThrow(
         { level: 'SU' },

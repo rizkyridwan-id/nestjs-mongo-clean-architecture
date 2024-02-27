@@ -1,5 +1,3 @@
-import { IsNumber, IsObject, IsString } from 'class-validator';
-
 interface IResponseDto<T = { [k: string]: any }> {
   status: number;
   data?: T;
@@ -15,15 +13,11 @@ export class ResponseDto<T = { [k: string]: any }> implements IResponseDto<T> {
     this.count = count;
   }
 
-  @IsNumber()
   status: number;
 
-  @IsObject()
   data?: T;
 
-  @IsString()
   message?: string;
 
-  @IsNumber()
   count?: number;
 }

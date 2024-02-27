@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { CustomLogger } from '../../../infra/logger/logger';
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { ZodError } from 'zod';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
@@ -13,6 +14,13 @@ export class AllExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<FastifyReply>();
     const request = ctx.getRequest<FastifyRequest>();
+
+    if (exception instanceof ZodError) {
+      response.status(400).send({
+        status: 400,
+        message: exception.issues.map((it) => it.message),
+      });
+    }
 
     const status = this._getErrorStatus(exception);
     const message = this._getErrorMessage(exception);

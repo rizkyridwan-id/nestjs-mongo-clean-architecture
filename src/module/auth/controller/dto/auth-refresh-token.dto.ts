@@ -1,9 +1,9 @@
-import { IsRequiredString } from 'src/core/decorator/required-string.decorator';
+import * as z from 'zod';
 
-export class AuthRefreshTokenRequestDTO {
-  @IsRequiredString()
-  user_id: string;
-
-  @IsRequiredString()
-  refresh_token: string;
-}
+export type AuthRefreshTokenRequestDto = z.infer<
+  typeof AuthRefreshTokenRequestDto
+>;
+export const AuthRefreshTokenRequestDto = z.object({
+  user_id: z.string(),
+  refresh_token: z.string(),
+});

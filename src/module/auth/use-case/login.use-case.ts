@@ -12,10 +12,7 @@ import { LoginRequestDto } from '../controller/dto/login-user-request.dto';
 
 type TLoginPayload = PickUseCasePayload<LoginRequestDto, 'data'>;
 @Injectable()
-export class LoginUser
-  extends BaseUseCase
-  implements IUseCase<LoginRequestDto>
-{
+export class LoginUser extends BaseUseCase implements IUseCase<TLoginPayload> {
   constructor(
     @InjectUserRepository private userRepository: UserRepositoryPort,
     private jwtService: JwtService,

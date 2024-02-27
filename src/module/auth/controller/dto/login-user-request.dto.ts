@@ -1,9 +1,7 @@
-import { IsRequiredString } from 'src/core/decorator/required-string.decorator';
+import * as z from 'zod';
 
-export class LoginRequestDto {
-  @IsRequiredString()
-  user_id: string;
-
-  @IsRequiredString()
-  password: string;
-}
+export type LoginRequestDto = z.infer<typeof LoginRequestDto>;
+export const LoginRequestDto = z.object({
+  user_id: z.string(),
+  password: z.string(),
+});

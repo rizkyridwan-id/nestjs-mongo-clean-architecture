@@ -30,15 +30,17 @@ export class BaseRepository<Entity, MongoEntity>
     private readonly mapper: DbMapper<Entity, MongoEntity>,
   ) {}
 
-  async findAll(session?: ClientSession): Promise<Array<MongoEntity>> {
+  async findAll(
+    session: ClientSession | null = null,
+  ): Promise<Array<MongoEntity>> {
     const result = await this.genericModel.find().session(session);
     return result.map((it) => it.toObject());
   }
 
   async findOne(
     identifier: FilterQuery<MongoEntity>,
-    session?: ClientSession,
-  ): Promise<MongoEntity> {
+    session: ClientSession | null = null,
+  ): Promise<MongoEntity | undefined> {
     const result = await this.genericModel.findOne(identifier).session(session);
     return result?.toObject();
   }
@@ -54,8 +56,8 @@ export class BaseRepository<Entity, MongoEntity>
   ): Promise<MongoEntity>;
   async findOneOrThrow(
     identifier: FilterQuery<MongoEntity>,
-    paramTwo?: string | ClientSession,
-    paramThree?: ClientSession,
+    paramTwo: string | ClientSession | null = null,
+    paramThree: ClientSession | null = null,
   ): Promise<MongoEntity> {
     const foundData = await this.genericModel
       .findOne(identifier)
@@ -84,8 +86,8 @@ export class BaseRepository<Entity, MongoEntity>
   ): Promise<void>;
   async findOneAndThrow(
     identifier: FilterQuery<MongoEntity>,
-    paramTwo?: string | ClientSession,
-    paramThree?: ClientSession,
+    paramTwo: string | ClientSession | null = null,
+    paramThree: ClientSession | null = null,
   ): Promise<void> {
     const foundData = await this.genericModel
       .findOne(identifier)
@@ -101,8 +103,8 @@ export class BaseRepository<Entity, MongoEntity>
 
   async findOneLatest(
     identifier: FilterQuery<MongoEntity>,
-    session?: ClientSession,
-  ): Promise<MongoEntity> {
+    session: ClientSession | null = null,
+  ): Promise<MongoEntity | undefined> {
     const result = await this.genericModel
       .findOne(identifier)
       .sort({ _id: -1 })
@@ -111,7 +113,10 @@ export class BaseRepository<Entity, MongoEntity>
     return result?.toObject();
   }
 
-  async findById(id: string, session?: ClientSession): Promise<MongoEntity> {
+  async findById(
+    id: string,
+    session: ClientSession | null = null,
+  ): Promise<MongoEntity | undefined> {
     this._validateMongoID(id);
     const result = await this.genericModel.findById(id).session(session);
     return result?.toObject();
@@ -119,7 +124,7 @@ export class BaseRepository<Entity, MongoEntity>
 
   async findBy(
     identifier: FilterQuery<MongoEntity>,
-    session?: ClientSession,
+    session: ClientSession | null = null,
   ): Promise<Array<MongoEntity>> {
     const result = await this.genericModel
       .aggregate([{ $match: identifier }])
@@ -144,7 +149,7 @@ export class BaseRepository<Entity, MongoEntity>
   async findByPaginateSorted(
     identifier: FilterQuery<MongoEntity>,
     paginationMeta: IPaginationMeta,
-    sort: Partial<Record<keyof MongoEntity, SortOrder>>,
+    sort: { [key: string]: SortOrder | { $meta: any } },
   ) {
     const { limit = 100, skip = 0 } = paginationMeta;
     const result = await this.genericModel

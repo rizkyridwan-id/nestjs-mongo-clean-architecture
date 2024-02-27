@@ -7,7 +7,7 @@ import chalk from 'chalk';
 
 export class CustomLogger implements LoggerService {
   private logger: Logger;
-  private context: string;
+  private context?: string;
 
   constructor(context?: string) {
     this.context = context;
@@ -26,11 +26,11 @@ export class CustomLogger implements LoggerService {
     this.logger.warn(message, meta);
   }
 
-  public debug?(message: any, ...meta: Array<any>) {
+  public debug(message: any, ...meta: Array<any>) {
     this.logger.log('debug', this.stringifyMessage(message), meta);
   }
 
-  public verbose?(message: any, ...meta: Array<any>) {
+  public verbose(message: any, ...meta: Array<any>) {
     this.logger.log('verbose', this.stringifyMessage(message, 4), meta);
   }
 

@@ -1,4 +1,4 @@
-import { Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
+import { Logger, NestApplicationOptions } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as fs from 'fs';
@@ -35,11 +35,10 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
-  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   app.useGlobalInterceptors(new DebugLoggerInterceptor());
   app.useGlobalFilters(new AllExceptionFilter());
 
-  const port = process.env.PORT;
+  const port = process.env.PORT || 3000;
   const host = '0.0.0.0';
   const logger = new Logger('NestBoilerplate');
 

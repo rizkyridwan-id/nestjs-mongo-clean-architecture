@@ -26,20 +26,20 @@ export class EnvService {
   private readonly _secretKey: string;
 
   constructor(private readonly configService: ConfigService) {
-    this._mode = this.configService.get<string>(EnvKey.MODE);
-    this._port = this.configService.get<string>(EnvKey.PORT);
+    this._mode = this.configService.get<string>(EnvKey.MODE)!;
+    this._port = this.configService.get<string>(EnvKey.PORT)!;
     this._httpsMode = Boolean(
-      +this.configService.get<number>(EnvKey.HTTPS_MODE),
+      +this.configService.get<number>(EnvKey.HTTPS_MODE)!,
     );
     this._dbConnectionUri = this.configService.get<string>(
       EnvKey.DB_CONNECTION_URI,
-    );
-    this._jwtSecretKey = this.configService.get<string>(EnvKey.JWT_SECRET_KEY);
+    )!;
+    this._jwtSecretKey = this.configService.get<string>(EnvKey.JWT_SECRET_KEY)!;
     this._jwtRefreshKey = this.configService.get<string>(
       EnvKey.JWT_REFRESH_KEY,
-    );
-    this._apiKey = this.configService.get<string>(EnvKey.API_KEY);
-    this._secretKey = this.configService.get<string>(EnvKey.SECRET_KEY);
+    )!;
+    this._apiKey = this.configService.get<string>(EnvKey.API_KEY)!;
+    this._secretKey = this.configService.get<string>(EnvKey.SECRET_KEY)!;
   }
 
   get variables(): IEnv {

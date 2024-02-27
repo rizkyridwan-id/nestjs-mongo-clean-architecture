@@ -1,7 +1,7 @@
-import { IsString } from 'class-validator';
 import { RegisterUserRequestDto } from 'src/module/auth/controller/dto/register-user-request.dto';
+import * as z from 'zod';
 
-export class CraeteUserRequestDto extends RegisterUserRequestDto {
-  @IsString()
-  level?: string;
-}
+export type CraeteUserRequestDto = z.infer<typeof CraeteUserRequestDto>;
+export const CraeteUserRequestDto = RegisterUserRequestDto.extend({
+  level: z.string().optional(),
+});

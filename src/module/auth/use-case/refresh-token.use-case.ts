@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { BaseUseCase, IUseCase } from 'src/core/base/module/use-case.base';
 import { PickUseCasePayload } from 'src/core/base/types/pick-use-case-payload.type';
 import { EnvService } from 'src/infra/config/env.service';
-import { AuthRefreshTokenRequestDTO } from 'src/module/auth/controller/dto/auth-refresh-token.dto';
+import { AuthRefreshTokenRequestDto } from 'src/module/auth/controller/dto/auth-refresh-token.dto';
 
 interface IHistoryRefreshToken {
   refresh_token: string;
@@ -11,13 +11,13 @@ interface IHistoryRefreshToken {
 }
 
 type TRefreshTokenPayload = PickUseCasePayload<
-  AuthRefreshTokenRequestDTO,
+  AuthRefreshTokenRequestDto,
   'data'
 >;
 @Injectable()
 export class RefreshToken
   extends BaseUseCase
-  implements IUseCase<AuthRefreshTokenRequestDTO>
+  implements IUseCase<TRefreshTokenPayload>
 {
   constructor(
     private jwtService: JwtService,

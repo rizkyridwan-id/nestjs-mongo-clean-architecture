@@ -1,15 +1,15 @@
-import { IdResponseDTO } from 'src/core/base/http/id-response.dto';
+import { IdResponseDto } from 'src/core/base/http/id-response.dto';
 import { UserResponseDtoProps } from 'src/port/dto/user.response-dto.port';
 
-export class UserResponseDTO
-  extends IdResponseDTO
+export class UserResponseDto
+  extends IdResponseDto
   implements UserResponseDtoProps
 {
   /**
    *
    * @param props {UserResponse}
    *
-   * Transform Plain object into DTO useful for whitelisting data,
+   * Transform Plain object into Dto useful for whitelisting data,
    * this will avoid data leak, and preventing return a whole bunch
    * of data to client.
    */
