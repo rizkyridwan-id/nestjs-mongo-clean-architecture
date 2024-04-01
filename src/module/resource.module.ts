@@ -1,20 +1,16 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { DebugLoggerMiddleware } from 'src/core/middleware/debug-logger.middleware';
-import { SignatureMiddleware } from 'src/core/middleware/signature.middleware';
-import {
-  protectedResourceControllers,
-  resourceProviders,
-} from './resource.provider';
+import { Module } from '@nestjs/common';
+import { resourceProviders } from './resource.provider';
+import { SignatureGuard } from 'src/core/guard/signature.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: SignatureGuard,
+    },
+  ],
   imports: resourceProviders,
   exports: resourceProviders,
 })
-export class ResourceModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(DebugLoggerMiddleware).forRoutes('*');
-    consumer
-      .apply(SignatureMiddleware)
-      .forRoutes(...protectedResourceControllers);
-  }
-}
+export class ResourceModule {}

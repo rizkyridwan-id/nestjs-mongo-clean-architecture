@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import * as ip from 'ip';
 import { CustomLogger } from './infra/logger/logger';
 import { AllExceptionFilter } from './core/base/http/base-http-exception.filter';
+import { DebugLoggerInterceptor } from './core/interceptor/debug-logger.interceptor';
 
 async function bootstrap() {
   const httpsMode = !!Number(process.env.HTTPS_MODE);
@@ -20,8 +21,10 @@ async function bootstrap() {
     cors: true, // change this to Client IP when Production
   });
 
-  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   app.setGlobalPrefix('api');
+
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+  app.useGlobalInterceptors(new DebugLoggerInterceptor());
   app.useGlobalFilters(new AllExceptionFilter());
 
   app.use(helmet());
@@ -30,7 +33,7 @@ async function bootstrap() {
   const host = '0.0.0.0';
   const logger = new Logger('NestBoilerplate');
 
-  await app.listen(process.env.PORT, host, () => {
+  await app.listen(port, host, () => {
     logger.log(`Application Started at port: ${port}, httpsMode: ${httpsMode}`);
     if (process.env.MODE == 'DEVELOPMENT')
       logger.log(`Current IP: ${ip.address()}`);
