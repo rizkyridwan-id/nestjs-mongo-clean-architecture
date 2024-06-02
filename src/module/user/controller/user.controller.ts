@@ -20,6 +20,7 @@ import {
   CreateUserRequestProps,
   UpdateUserRequestProps,
 } from '../contract/user.request.contract';
+import { GetPaginationProps } from 'src/core/contract/get-pagination.request.contract';
 
 @Controller('v1/users')
 export class UsersController {
@@ -39,7 +40,7 @@ export class UsersController {
   }
 
   @SecureGet()
-  async getUserHandler(@ZodQuery(GetPaginationDto) query: GetPaginationDto) {
+  async getUserHandler(@ZodQuery(GetPaginationDto) query: GetPaginationProps) {
     return this.getUser.execute({ data: query });
   }
 

@@ -18,7 +18,7 @@ export class AllExceptionFilter implements ExceptionFilter {
     if (exception instanceof ZodError) {
       response.status(400).send({
         status: 400,
-        message: exception.issues.map((it) => it.message),
+        message: exception.issues,
       });
     }
 

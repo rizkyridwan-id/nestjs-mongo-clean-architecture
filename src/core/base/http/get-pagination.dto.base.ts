@@ -1,10 +1,5 @@
-import { SortOrder } from 'mongoose';
 import { GetPaginationProps } from 'src/core/contract/get-pagination.request.contract';
 import * as z from 'zod';
-
-export type GetPaginationDto = z.infer<typeof GetPaginationDto> & {
-  sort_by?: SortOrder;
-};
 
 export const GetPaginationDto = z.object({
   skip: z

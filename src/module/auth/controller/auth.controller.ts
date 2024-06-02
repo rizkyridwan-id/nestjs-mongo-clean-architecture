@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Headers,
-  Post,
-} from '@nestjs/common';
+import { BadRequestException, Controller, Headers, Post } from '@nestjs/common';
 import { LoginRequestDto } from './dto/login-user-request.dto';
 import { LoginUser } from '../use-case/login.use-case';
 import { CreateUser } from 'src/module/user/use-case/create-user.use-case';
