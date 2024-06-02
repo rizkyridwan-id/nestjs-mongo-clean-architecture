@@ -2,6 +2,6 @@ import { RegisterUserRequestDto } from 'src/module/auth/controller/dto/register-
 import * as z from 'zod';
 import { CreateUserRequestProps } from '../../contract/user.request.contract';
 
-export const CraeteUserRequestDto = RegisterUserRequestDto.extend({
+export const CreateUserRequestDto = RegisterUserRequestDto.extend({
   level: z.string(),
 }) satisfies z.ZodType<CreateUserRequestProps>;

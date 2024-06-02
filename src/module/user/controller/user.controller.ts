@@ -12,7 +12,7 @@ import { DeleteUser } from '../use-case/delete-user.use-case';
 import { GetUser } from '../use-case/get-user.use-case';
 import { UpdateUser } from '../use-case/update-user.use-case';
 
-import { CraeteUserRequestDto } from './dtos/create-user.request.dto';
+import { CreateUserRequestDto } from './dtos/create-user.request.dto';
 import { UpdateUserRequestDto } from './dtos/update-user.request.dto';
 import { ZodBody } from 'src/core/decorator/zod-body.decorator';
 import { ZodQuery } from 'src/core/decorator/zod-query.decorator';
@@ -33,7 +33,7 @@ export class UsersController {
 
   @SecurePost()
   async createUserHandler(
-    @ZodBody(CraeteUserRequestDto) body: CreateUserRequestProps,
+    @ZodBody(CreateUserRequestDto) body: CreateUserRequestProps,
     @AuthUser() user: JwtDecoded,
   ) {
     return await this.createUser.execute({ data: body, user });
