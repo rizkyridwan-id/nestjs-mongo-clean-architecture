@@ -2,19 +2,19 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ResponseDto } from 'src/core/base/http/response.dto.base';
 import {
   BaseUseCase,
-  IUseCase,
   IUseCasePayload,
 } from 'src/core/base/module/use-case.base';
 import { InjectUserRepository } from '../repository/user.repository.provider';
-import { UserRepositoryPort } from 'src/port/repository/user.repository.port';
+import { UserRepositoryPort } from 'src/module/user/repository/user.repository.port';
 
 type TDeleteUserPayload = Pick<IUseCasePayload<never>, '_id'>;
+type TDeleteUserResponse = ResponseDto;
 
 @Injectable()
-export class DeleteUser
-  extends BaseUseCase
-  implements IUseCase<TDeleteUserPayload>
-{
+export class DeleteUser extends BaseUseCase<
+  TDeleteUserPayload,
+  TDeleteUserResponse
+> {
   constructor(
     @InjectUserRepository private userRepository: UserRepositoryPort,
   ) {

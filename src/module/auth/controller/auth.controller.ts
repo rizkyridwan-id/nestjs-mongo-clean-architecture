@@ -9,7 +9,7 @@ import { LoginRequestDto } from './dto/login-user-request.dto';
 import { LoginUser } from '../use-case/login.use-case';
 import { CreateUser } from 'src/module/user/use-case/create-user.use-case';
 import { RegisterUserRequestDto } from './dto/register-user-request.dto';
-import { AuthRefreshTokenRequestDTO } from 'src/module/auth/controller/dto/auth-refresh-token.dto';
+import { AuthRefreshTokenRequestDto } from 'src/module/auth/controller/dto/auth-refresh-token.dto';
 import { RefreshToken } from '../use-case/refresh-token.use-case';
 @Controller('v1/auth')
 export class AuthController {
@@ -38,7 +38,7 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refreshTokenHandler(@Body() body: AuthRefreshTokenRequestDTO) {
+  async refreshTokenHandler(@Body() body: AuthRefreshTokenRequestDto) {
     return this.refreshToken.execute({ data: body });
   }
 }

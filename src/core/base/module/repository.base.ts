@@ -15,11 +15,11 @@ import {
   Types,
   UpdateQuery,
 } from 'mongoose';
-import { IRepositoryResponse } from '../../../port/interface/repository-response.interface';
-import { BaseRepositoryPort } from '../../../port/repository/repository.base.port';
-import { IPaginationMeta } from '../../../port/interface/pagination-meta.interface';
+import { BaseRepositoryPort } from '../../port/repository.base.port';
 import { DbMapper } from '../domain/db-mapper';
 import { TypeValidator } from '../../logic/type-validator';
+import { IPaginationMeta } from 'src/core/interface/pagination-meta.interface';
+import { IRepositoryResponse } from 'src/core/interface/repository-response.interface';
 
 @Injectable()
 export abstract class BaseRepository<Entity, MongoEntity>

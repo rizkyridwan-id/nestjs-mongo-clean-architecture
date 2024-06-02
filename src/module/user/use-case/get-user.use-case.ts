@@ -1,16 +1,17 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { GetPaginationDto } from 'src/core/base/http/get-pagination.dto.base';
 import { ResponseDto } from 'src/core/base/http/response.dto.base';
-import { BaseUseCase, IUseCase } from 'src/core/base/module/use-case.base';
+import { BaseUseCase } from 'src/core/base/module/use-case.base';
 import { PickUseCasePayload } from 'src/core/base/types/pick-use-case-payload.type';
-import { UserRepositoryPort } from 'src/port/repository/user.repository.port';
+import { UserRepositoryPort } from 'src/module/user/repository/user.repository.port';
 import { InjectUserRepository } from '../repository/user.repository.provider';
 import { UserMapper } from '../domain/user.mapper';
-import { UserResponseDto } from '../controller/dtos/user.response.dto';
+import { UserResponseProps } from '../contract/user.response.contract';
+import { GetPaginationProps } from 'src/core/contract/get-pagination.request.contract';
 
-export type TGetUserPayload = PickUseCasePayload<GetPaginationDto, 'data'>;
+export type TGetUserPayload = PickUseCasePayload<GetPaginationProps, 'data'>;
+export type TGetUserResponse = ResponseDto<UserResponseProps[]>;
 @Injectable()
-export class GetUser extends BaseUseCase implements IUseCase<TGetUserPayload> {
+export class GetUser extends BaseUseCase<TGetUserPayload, TGetUserResponse> {
   constructor(
     @InjectUserRepository private readonly userRepository: UserRepositoryPort,
   ) {
@@ -23,9 +24,15 @@ export class GetUser extends BaseUseCase implements IUseCase<TGetUserPayload> {
       data.sort_by || { _id: 1 },
     );
 
-    const usersMapped = users.map(
-      (user) => new UserResponseDto(UserMapper.toPlainObject(user)),
-    );
+    const usersMapped: UserResponseProps[] = users.map((user) => {
+      const userObject = UserMapper.toPlainObject(user);
+      return {
+        _id: userObject._id,
+        level: userObject.level,
+        user_id: userObject.user_id,
+        user_name: userObject.user_name,
+      };
+    });
 
     return new ResponseDto({ status: HttpStatus.OK, data: usersMapped });
   }
