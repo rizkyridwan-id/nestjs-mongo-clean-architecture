@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { CustomLogger } from '../../infra/logger/logger';
 import { Observable, tap } from 'rxjs';
+import * as qs from 'qs';
 
 @Injectable()
 export class DebugLoggerInterceptor implements NestInterceptor {
@@ -29,7 +30,7 @@ export class DebugLoggerInterceptor implements NestInterceptor {
       }
 
       if (typeof query === 'object' && Object.keys(query).length) {
-        this.logger.debug('Query' + JSON.stringify(query, null, 2));
+        this.logger.debug('Query' + JSON.stringify(qs.parse(query), null, 2));
       }
     }
 
