@@ -12,7 +12,7 @@ import { ResponseDto } from 'src/core/base/http/response.dto.base';
 
 import { PickUseCasePayload } from 'src/core/base/types/pick-use-case-payload.type';
 import { ObjectIdVO } from 'src/core/value-object/object-id.value-object';
-import { UpdateUserRequestDTO } from '../controller/dtos/update-user.request.dto';
+import { UpdateUserRequestDto } from '../controller/dtos/update-user.request.dto';
 import { UserRepositoryPort } from 'src/port/repository/user.repository.port';
 
 type TUpdateUserPayload = PickUseCasePayload<
