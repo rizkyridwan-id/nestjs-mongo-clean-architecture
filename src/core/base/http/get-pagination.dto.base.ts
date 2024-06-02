@@ -1,4 +1,5 @@
 import { SortOrder } from 'mongoose';
+import { GetPaginationProps } from 'src/core/contract/get-pagination.request.contract';
 import * as z from 'zod';
 
 export type GetPaginationDto = z.infer<typeof GetPaginationDto> & {
@@ -18,4 +19,4 @@ export const GetPaginationDto = z.object({
   sort_by: z
     .record(z.enum(['asc', 'ascending', 'desc', 'descending']))
     .optional(),
-});
+}) satisfies z.ZodType<GetPaginationProps>;

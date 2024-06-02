@@ -1,9 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { BaseUseCase, IUseCase } from 'src/core/base/module/use-case.base';
+import { BaseUseCase } from 'src/core/base/module/use-case.base';
 import { PickUseCasePayload } from 'src/core/base/types/pick-use-case-payload.type';
 import { EnvService } from 'src/infra/config/env.service';
-import { AuthRefreshTokenRequestDto } from 'src/module/auth/controller/dto/auth-refresh-token.dto';
+import { AuthRefreshTokenRequestProps } from '../contract/auth.request.contract';
+import { ResponseDto } from 'src/core/base/http/response.dto.base';
+import { RefreshTokenResponseProps } from '../contract/auth.response.contract';
 
 interface IHistoryRefreshToken {
   refresh_token: string;
@@ -11,14 +13,15 @@ interface IHistoryRefreshToken {
 }
 
 type TRefreshTokenPayload = PickUseCasePayload<
-  AuthRefreshTokenRequestDto,
+  AuthRefreshTokenRequestProps,
   'data'
 >;
+type TRefreshTokenResponse = ResponseDto<RefreshTokenResponseProps>;
 @Injectable()
-export class RefreshToken
-  extends BaseUseCase
-  implements IUseCase<TRefreshTokenPayload>
-{
+export class RefreshToken extends BaseUseCase<
+  TRefreshTokenPayload,
+  TRefreshTokenResponse
+> {
   constructor(
     private jwtService: JwtService,
     private envService: EnvService,
@@ -39,7 +42,10 @@ export class RefreshToken
     });
     this._registerUsedRefreshToken(data.refresh_token);
 
-    return { access_token: token, refresh_token: refreshToken };
+    return new ResponseDto({
+      status: HttpStatus.OK,
+      data: { access_token: token, refresh_token: refreshToken },
+    });
   }
 
   private _validateRefreshToken(refreshToken: string, user_id: string) {

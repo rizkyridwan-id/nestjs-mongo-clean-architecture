@@ -1,12 +1,7 @@
-interface IResponseDto<T = { [k: string]: any }> {
-  status: number;
-  data?: T;
-  message?: string;
-  count?: number;
-}
+import { ResponseProps } from 'src/core/contract/response.contract';
 
-export class ResponseDto<T = { [k: string]: any }> implements IResponseDto<T> {
-  constructor({ status, data, message = '', count = 0 }: IResponseDto<T>) {
+export class ResponseDto<T = { [k: string]: any }> implements ResponseProps<T> {
+  constructor({ status, data, message = '', count = 0 }: ResponseProps<T>) {
     this.status = status;
     this.data = data;
     this.message = message;

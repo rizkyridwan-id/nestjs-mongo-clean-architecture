@@ -7,30 +7,31 @@ import {
 
 import { InjectUserRepository } from '../repository/user.repository.provider';
 
-import { BaseUseCase, IUseCase } from 'src/core/base/module/use-case.base';
+import { BaseUseCase } from 'src/core/base/module/use-case.base';
 import { ResponseDto } from 'src/core/base/http/response.dto.base';
 
 import { PickUseCasePayload } from 'src/core/base/types/pick-use-case-payload.type';
 import { ObjectIdVO } from 'src/core/value-object/object-id.value-object';
-import { UpdateUserRequestDto } from '../controller/dtos/update-user.request.dto';
-import { UserRepositoryPort } from 'src/port/repository/user.repository.port';
+import { UserRepositoryPort } from 'src/module/user/repository/user.repository.port';
+import { UpdateUserRequestProps } from '../contract/user.request.contract';
 
 type TUpdateUserPayload = PickUseCasePayload<
-  UpdateUserRequestDto,
+  UpdateUserRequestProps,
   'data' | '_id'
 >;
+type TUpdateUserResponse = ResponseDto;
 @Injectable()
-export class UpdateUser
-  extends BaseUseCase
-  implements IUseCase<TUpdateUserPayload>
-{
+export class UpdateUser extends BaseUseCase<
+  TUpdateUserPayload,
+  TUpdateUserResponse
+> {
   constructor(
     @InjectUserRepository private userRepository: UserRepositoryPort,
   ) {
     super();
   }
 
-  async execute({ data, _id }: TUpdateUserPayload): Promise<ResponseDto> {
+  async execute({ data, _id }: TUpdateUserPayload) {
     try {
       const userEntity = await this.userRepository.findById(
         new ObjectIdVO(_id).valueConverted,

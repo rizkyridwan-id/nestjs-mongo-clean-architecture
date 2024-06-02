@@ -1,19 +1,21 @@
 import { HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ResponseDto } from 'src/core/base/http/response.dto.base';
-import { BaseUseCase, IUseCase } from 'src/core/base/module/use-case.base';
+import { BaseUseCase } from 'src/core/base/module/use-case.base';
 import { PickUseCasePayload } from 'src/core/base/types/pick-use-case-payload.type';
 
 import { EnvService } from 'src/infra/config/env.service';
 import { InjectUserRepository } from 'src/module/user/repository/user.repository.provider';
 import { UserEntity } from 'src/module/user/domain/user.entity';
-import { UserRepositoryPort } from '../../../port/repository/user.repository.port';
-import { LoginRequestDto } from '../controller/dto/login-user-request.dto';
+import { UserRepositoryPort } from '../../user/repository/user.repository.port';
 import { UserMapper } from 'src/module/user/domain/user.mapper';
+import { LoginUserRequestProps } from '../contract/auth.request.contract';
+import { LoginUserResponseProps } from '../contract/auth.response.contract';
 
-type TLoginPayload = PickUseCasePayload<LoginRequestDto, 'data'>;
+type TLoginPayload = PickUseCasePayload<LoginUserRequestProps, 'data'>;
+type TLoginResponse = ResponseDto<LoginUserResponseProps>;
 @Injectable()
-export class LoginUser extends BaseUseCase implements IUseCase<TLoginPayload> {
+export class LoginUser extends BaseUseCase<TLoginPayload, TLoginResponse> {
   constructor(
     @InjectUserRepository private userRepository: UserRepositoryPort,
     private jwtService: JwtService,
@@ -22,7 +24,7 @@ export class LoginUser extends BaseUseCase implements IUseCase<TLoginPayload> {
     super();
   }
 
-  public async execute({ data }: TLoginPayload): Promise<ResponseDto> {
+  public async execute({ data }: TLoginPayload) {
     const userData = await this.userRepository.findOneOrThrow(
       {
         user_id: data.user_id,

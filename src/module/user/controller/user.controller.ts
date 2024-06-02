@@ -16,6 +16,10 @@ import { CraeteUserRequestDto } from './dtos/create-user.request.dto';
 import { UpdateUserRequestDto } from './dtos/update-user.request.dto';
 import { ZodBody } from 'src/core/decorator/zod-body.decorator';
 import { ZodQuery } from 'src/core/decorator/zod-query.decorator';
+import {
+  CreateUserRequestProps,
+  UpdateUserRequestProps,
+} from '../contract/user.request.contract';
 
 @Controller('v1/users')
 export class UsersController {
@@ -28,7 +32,7 @@ export class UsersController {
 
   @SecurePost()
   async createUserHandler(
-    @ZodBody(CraeteUserRequestDto) body: CraeteUserRequestDto,
+    @ZodBody(CraeteUserRequestDto) body: CreateUserRequestProps,
     @AuthUser() user: JwtDecoded,
   ) {
     return await this.createUser.execute({ data: body, user });
@@ -47,7 +51,7 @@ export class UsersController {
   @SecurePut(':_id')
   update(
     @ZodBody(UpdateUserRequestDto)
-    body: UpdateUserRequestDto,
+    body: UpdateUserRequestProps,
     @Param('_id') _id: string,
   ) {
     return this.updateUser.execute({ _id, data: body });
