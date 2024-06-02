@@ -5,13 +5,16 @@ import {
   IUseCase,
   IUseCasePayload,
 } from 'src/core/base/module/use-case.base';
-import { UserRepositoryPort } from '../../../port/repository/user.repository.port';
 import { InjectUserRepository } from '../repository/user.repository.provider';
+import { UserRepositoryPort } from 'src/port/repository/user.repository.port';
 
 type TDeleteUserPayload = Pick<IUseCasePayload<never>, '_id'>;
 
 @Injectable()
-export class DeleteUser extends BaseUseCase implements IUseCase<never> {
+export class DeleteUser
+  extends BaseUseCase
+  implements IUseCase<TDeleteUserPayload>
+{
   constructor(
     @InjectUserRepository private userRepository: UserRepositoryPort,
   ) {
@@ -22,9 +25,10 @@ export class DeleteUser extends BaseUseCase implements IUseCase<never> {
     try {
       await this.userRepository.delete({ _id });
     } catch (err) {
-      this.logger.error(err.message, err.trace);
+      this.logger.error(err);
+      if (err instanceof HttpException) throw err;
 
-      throw new HttpException(err.message, err.status || 500);
+      throw new HttpException(err.message, 500);
     }
     return new ResponseDto({
       status: HttpStatus.OK,

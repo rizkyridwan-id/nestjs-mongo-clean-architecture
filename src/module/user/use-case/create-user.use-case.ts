@@ -24,7 +24,7 @@ type TCreateUserPayload = PickUseCasePayload<
 @Injectable()
 export class CreateUser
   extends BaseUseCase
-  implements IUseCase<CraeteUserRequestDto>
+  implements IUseCase<TCreateUserPayload>
 {
   constructor(
     @InjectUserRepository private userRepository: UserRepositoryPort,
@@ -55,7 +55,7 @@ export class CreateUser
 
       return new ResponseDto({ status: HttpStatus.CREATED, data: result });
     } catch (err) {
-      this.logger.error(err.message);
+      this.logger.error(err);
 
       throw new HttpException(
         { message: err.message || err },
@@ -75,7 +75,7 @@ export class CreateUser
     if (secretKey && !isSecretKeyValid)
       throw new BadRequestException('Wrong Key Input. Transaction aborted.');
 
-    return isSecretKeyValid;
+    return isSecretKeyValid || false;
   }
   private async _generateUserLevel(isSecretKeyValid: boolean, level: string) {
     if (isSecretKeyValid)
@@ -83,10 +83,6 @@ export class CreateUser
         { level: 'SU' },
         'Level System Sudah Terdaftar.',
       );
-    return isSecretKeyValid
-      ? new UserLevel('SU')
-      : level
-        ? new UserLevel(level)
-        : new UserLevel('ADMIN');
+    return isSecretKeyValid ? new UserLevel('SU') : new UserLevel(level!);
   }
 }

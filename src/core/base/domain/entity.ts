@@ -1,27 +1,23 @@
-import { DateVO } from 'src/core/value-object/date.value-object';
+import { Types } from 'mongoose';
 import { Guard } from '../../logic/guard';
 
 export abstract class Entity<EntityProps> {
-  protected _input_date: DateVO;
   protected props: EntityProps;
+  protected _id: Types.ObjectId;
 
-  constructor(props: EntityProps) {
+  constructor(props: EntityProps, _id?: Types.ObjectId) {
     this.validateProps(props);
-    const now = DateVO.now();
-    this._input_date = now;
     this.props = props;
-  }
-
-  get input_date(): Date {
-    return this._input_date.value;
+    this._id = _id || new Types.ObjectId();
   }
 
   public static isEntity(entity: unknown): entity is Entity<unknown> {
     return entity instanceof Entity;
   }
 
-  public getPropsCopy(): EntityProps {
+  public get propsCopy() {
     const propsCopy = {
+      _id: this._id,
       ...this.props,
     };
     return Object.freeze(propsCopy);

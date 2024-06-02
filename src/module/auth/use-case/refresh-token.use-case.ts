@@ -17,7 +17,7 @@ type TRefreshTokenPayload = PickUseCasePayload<
 @Injectable()
 export class RefreshToken
   extends BaseUseCase
-  implements IUseCase<AuthRefreshTokenRequestDTO>
+  implements IUseCase<TRefreshTokenPayload>
 {
   constructor(
     private jwtService: JwtService,

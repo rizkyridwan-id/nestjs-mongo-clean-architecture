@@ -19,7 +19,7 @@ export class AllExceptionFilter implements ExceptionFilter {
     const messageValue: string =
       typeof message !== 'string' ? message.message : message;
 
-    const logger = new CustomLogger('HF');
+    const logger = new CustomLogger('E_FILTER');
     logger.error(
       messageValue,
       `(${request.method})${request.url.replace(/^\/api/, '')}`,

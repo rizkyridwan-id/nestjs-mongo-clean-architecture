@@ -9,13 +9,11 @@ import { InjectUserRepository } from 'src/module/user/repository/user.repository
 import { UserEntity } from 'src/module/user/domain/user.entity';
 import { UserRepositoryPort } from '../../../port/repository/user.repository.port';
 import { LoginRequestDto } from '../controller/dto/login-user-request.dto';
+import { UserMapper } from 'src/module/user/domain/user.mapper';
 
 type TLoginPayload = PickUseCasePayload<LoginRequestDto, 'data'>;
 @Injectable()
-export class LoginUser
-  extends BaseUseCase
-  implements IUseCase<LoginRequestDto>
-{
+export class LoginUser extends BaseUseCase implements IUseCase<TLoginPayload> {
   constructor(
     @InjectUserRepository private userRepository: UserRepositoryPort,
     private jwtService: JwtService,
@@ -32,16 +30,17 @@ export class LoginUser
       'Username atau password salah.',
     );
 
+    const userProps = userData.propsCopy;
     const passwordMatch = await UserEntity.comparePassword(
       data.password,
-      userData.password,
+      userProps.password,
     );
     if (!passwordMatch) {
       throw new UnauthorizedException('Username or Password is Incorrect.');
     }
 
     const jwtPayload = {
-      sub: userData.user_id,
+      sub: userProps.user_id,
     };
 
     const accessToken = this.jwtService.sign(jwtPayload);
@@ -50,14 +49,15 @@ export class LoginUser
       secret: this.envService.variables.jwtRefreshKey,
     });
 
+    const userObject = UserMapper.toPlainObject(userData);
     return new ResponseDto({
       status: HttpStatus.OK,
       data: {
-        user_id: userData.user_id,
+        user_id: userObject.user_id,
         access_token: accessToken,
         refresh_token: refreshToken,
-        level: userData.level,
-        user_name: userData.user_name,
+        level: userObject.level,
+        user_name: userObject.user_name,
       },
     });
   }

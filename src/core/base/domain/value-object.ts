@@ -6,11 +6,10 @@ type ValueObjectProps<T extends TPrimitive | Date> = DomainPrimitive<T>;
 
 export abstract class ValueObject<T extends TPrimitive | Date> {
   protected readonly props: ValueObjectProps<T>;
-  protected readonly isAllowEmpty: boolean;
+  protected label?: string;
 
-  constructor(props: ValueObjectProps<T>, isAllowEmpty = false) {
-    this.isAllowEmpty = isAllowEmpty;
-
+  constructor(props: ValueObjectProps<T>, label?: string) {
+    this.label = label;
     this._checkIfEmpty(props);
     this.validate(props);
     this.props = props;
@@ -27,13 +26,11 @@ export abstract class ValueObject<T extends TPrimitive | Date> {
   }
 
   private _checkIfEmpty(props: ValueObjectProps<T>): void {
-    if (!this.isAllowEmpty) {
-      if (
-        Guard.isEmpty(props) ||
-        (this._isDomainPrimitive(props) && Guard.isEmpty(props.value))
-      ) {
-        throw new Error('Property cannot be empty');
-      }
+    if (
+      Guard.isEmpty(props) ||
+      (this._isDomainPrimitive(props) && Guard.isEmpty(props.value))
+    ) {
+      throw new Error('Property cannot be empty');
     }
   }
 
