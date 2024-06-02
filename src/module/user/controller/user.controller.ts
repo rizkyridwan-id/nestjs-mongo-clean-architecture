@@ -13,7 +13,7 @@ import { GetUser } from '../use-case/get-user.use-case';
 import { UpdateUser } from '../use-case/update-user.use-case';
 
 import { CraeteUserRequestDto } from './dtos/create-user.request.dto';
-import { UpdateUserRequestDTO } from './dtos/update-user.request.dto';
+import { UpdateUserRequestDto } from './dtos/update-user.request.dto';
 
 @Controller('v1/users')
 export class UsersController {
@@ -43,7 +43,7 @@ export class UsersController {
   }
 
   @SecurePut(':_id')
-  update(@Param('_id') _id: string, @Body() body: UpdateUserRequestDTO) {
+  update(@Param('_id') _id: string, @Body() body: UpdateUserRequestDto) {
     return this.updateUser.execute({ _id, data: body });
   }
 }

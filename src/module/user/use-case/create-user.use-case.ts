@@ -5,27 +5,29 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { ResponseDto } from 'src/core/base/http/response.dto.base';
-import { BaseUseCase, IUseCase } from 'src/core/base/module/use-case.base';
+import { BaseUseCase } from 'src/core/base/module/use-case.base';
 
-import { OptionalSecretKey } from 'src/port/interface/optional-secret-key.interface';
 import { EnvService } from 'src/infra/config/env.service';
-import { UserRepositoryPort } from '../../../port/repository/user.repository.port';
-import { CraeteUserRequestDto } from '../controller/dtos/create-user.request.dto';
+import { UserRepositoryPort } from '../repository/user.repository.port';
 import { InjectUserRepository } from '../repository/user.repository.provider';
 import { UserEntity } from '../domain/user.entity';
 import { UserLevel } from '../domain/value-objects/user-level.value-object';
 import { PickUseCasePayload } from 'src/core/base/types/pick-use-case-payload.type';
 import { SHA256 } from 'crypto-js';
+import { OptionalSecretKeyProps } from 'src/core/contract/optional-secret-key.request.contract';
+import { CreateUserRequestProps } from '../contract/user.request.contract';
+import { IRepositoryResponse } from 'src/core/interface/repository-response.interface';
 type TCreateUserPayload = PickUseCasePayload<
-  CraeteUserRequestDto & OptionalSecretKey,
+  CreateUserRequestProps & OptionalSecretKeyProps,
   'data' | 'user'
 >;
+type TCreateUserResponse = ResponseDto<IRepositoryResponse>;
 
 @Injectable()
-export class CreateUser
-  extends BaseUseCase
-  implements IUseCase<TCreateUserPayload>
-{
+export class CreateUser extends BaseUseCase<
+  TCreateUserPayload,
+  TCreateUserResponse
+> {
   constructor(
     @InjectUserRepository private userRepository: UserRepositoryPort,
     private envService: EnvService,
@@ -33,10 +35,7 @@ export class CreateUser
     super();
   }
 
-  public async execute({
-    data,
-    user,
-  }: TCreateUserPayload): Promise<ResponseDto> {
+  public async execute({ data, user }: TCreateUserPayload) {
     await this.userRepository.findOneAndThrow({ user_id: data.user_id });
 
     const isSecretKeyValid = await this._validateSecretKey(data.secretKey);

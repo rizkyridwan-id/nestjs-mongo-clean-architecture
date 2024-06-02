@@ -7,7 +7,7 @@ import { UserEntity } from '../domain/user.entity';
 import { UserMapper } from '../domain/user.mapper';
 
 import { BaseRepository } from 'src/core/base/module/repository.base';
-import { UserRepositoryPort } from 'src/port/repository/user.repository.port';
+import { UserRepositoryPort } from 'src/module/user/repository/user.repository.port';
 
 @Injectable()
 export class UserRepository
