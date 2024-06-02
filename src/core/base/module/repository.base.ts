@@ -22,43 +22,42 @@ import { DbMapper } from '../domain/db-mapper';
 import { TypeValidator } from '../../logic/type-validator';
 
 @Injectable()
-export class BaseRepository<Entity, MongoEntity>
+export abstract class BaseRepository<Entity, MongoEntity>
   implements BaseRepositoryPort<Entity, MongoEntity>
 {
   constructor(
     private readonly genericModel: Model<MongoEntity>,
-    private readonly mapper: DbMapper<Entity, MongoEntity>,
+    protected readonly mapper: DbMapper<Entity, MongoEntity>,
   ) {}
 
-  async findAll(
-    session: ClientSession | null = null,
-  ): Promise<Array<MongoEntity>> {
+  async findAll(session: ClientSession | null = null): Promise<Entity[]> {
     const result = await this.genericModel.find().session(session);
-    return result.map((it) => it.toObject());
+    return result.map((it) => this.mapper.toDomain(it));
   }
 
   async findOne(
     identifier: FilterQuery<MongoEntity>,
     session: ClientSession | null = null,
-  ): Promise<MongoEntity | undefined> {
+  ): Promise<Entity | undefined> {
     const result = await this.genericModel.findOne(identifier).session(session);
-    return result?.toObject();
+    if (!result) return;
+    return this.mapper.toDomain(result?.toObject());
   }
 
   async findOneOrThrow(
     identifier: FilterQuery<MongoEntity>,
     session?: ClientSession,
-  ): Promise<MongoEntity>;
+  ): Promise<Entity>;
   async findOneOrThrow(
     identifier: FilterQuery<MongoEntity>,
     errorMessage?: string,
     session?: ClientSession,
-  ): Promise<MongoEntity>;
+  ): Promise<Entity>;
   async findOneOrThrow(
     identifier: FilterQuery<MongoEntity>,
     paramTwo: string | ClientSession | null = null,
     paramThree: ClientSession | null = null,
-  ): Promise<MongoEntity> {
+  ): Promise<Entity> {
     const foundData = await this.genericModel
       .findOne(identifier)
       .session(typeof paramTwo !== 'string' ? paramTwo : paramThree);
@@ -72,7 +71,7 @@ export class BaseRepository<Entity, MongoEntity>
               .toUpperCase()} NOT FOUND`,
       );
     }
-    return foundData?.toObject();
+    return this.mapper.toDomain(foundData);
   }
 
   async findOneAndThrow(
@@ -104,33 +103,35 @@ export class BaseRepository<Entity, MongoEntity>
   async findOneLatest(
     identifier: FilterQuery<MongoEntity>,
     session: ClientSession | null = null,
-  ): Promise<MongoEntity | undefined> {
+  ): Promise<Entity | undefined> {
     const result = await this.genericModel
       .findOne(identifier)
       .sort({ _id: -1 })
       .session(session);
+    if (!result) return;
 
-    return result?.toObject();
+    return this.mapper.toDomain(result);
   }
 
   async findById(
-    id: string,
+    id: Types.ObjectId,
     session: ClientSession | null = null,
-  ): Promise<MongoEntity | undefined> {
+  ): Promise<Entity | undefined> {
     this._validateMongoID(id);
     const result = await this.genericModel.findById(id).session(session);
-    return result?.toObject();
+    if (!result) return;
+    return this.mapper.toDomain(result);
   }
 
   async findBy(
     identifier: FilterQuery<MongoEntity>,
     session: ClientSession | null = null,
-  ): Promise<Array<MongoEntity>> {
+  ): Promise<Entity[]> {
     const result = await this.genericModel
       .aggregate([{ $match: identifier }])
       .session(session);
 
-    return result.map((it) => it.toObject());
+    return result.map((it) => this.mapper.toDomain(it));
   }
 
   async findByPaginated(
@@ -143,7 +144,7 @@ export class BaseRepository<Entity, MongoEntity>
       .skip(skip)
       .limit(limit);
 
-    return result.map((it) => it.toObject());
+    return result.map((it) => this.mapper.toDomain(it));
   }
 
   async findByPaginateSorted(
@@ -158,7 +159,7 @@ export class BaseRepository<Entity, MongoEntity>
       .sort(sort)
       .limit(limit);
 
-    return result.map((it) => it.toObject());
+    return result.map((it) => this.mapper.toDomain(it));
   }
 
   async count(): Promise<number> {
@@ -173,7 +174,9 @@ export class BaseRepository<Entity, MongoEntity>
     entity: Entity,
     session?: ClientSession,
   ): Promise<IRepositoryResponse> {
-    const mongoEntity = this.mapper.toMongoEntity(entity);
+    const mongoEntity = new this.genericModel(
+      this.mapper.toPlainObject(entity),
+    );
     const newModel = new this.genericModel(mongoEntity);
     const result = await newModel.save({ session });
     return {
@@ -184,14 +187,16 @@ export class BaseRepository<Entity, MongoEntity>
     entity: Entity,
     session?: ClientSession,
   ): Promise<Document<unknown, unknown, MongoEntity>> {
-    const mongoEntity = this.mapper.toMongoEntity(entity);
+    const mongoEntity = new this.genericModel(
+      this.mapper.toPlainObject(entity),
+    );
     const newModel = new this.genericModel(mongoEntity);
     const result = await newModel.save({ session });
     return result?.toObject();
   }
   async saveMany(entities: Entity[], session?: ClientSession) {
-    const mongoEntities = entities.map((entity) =>
-      this.mapper.toMongoEntity(entity),
+    const mongoEntities = entities.map(
+      (entity) => new this.genericModel(this.mapper.toPlainObject(entity)),
     );
     const mongoEntitiesEncrypted = mongoEntities;
     const saveResult = await this.genericModel.insertMany(
@@ -203,21 +208,21 @@ export class BaseRepository<Entity, MongoEntity>
     };
   }
 
-  async update(
+  async updateOne(
     identifier: FilterQuery<MongoEntity>,
-    data: UpdateQuery<Partial<MongoEntity>>,
+    data: Entity,
     session?: ClientSession,
   ): Promise<IRepositoryResponse> {
-    if (identifier._id && typeof identifier._id === 'string')
-      this._validateMongoID(identifier._id);
+    if (identifier._id) this._validateMongoID(identifier._id);
 
-    const { matchedCount, modifiedCount } = await this.genericModel.updateMany(
+    const { matchedCount, modifiedCount } = await this.genericModel.updateOne(
       identifier,
-      data,
+      this.mapper.toPlainObject(data),
       {
         session,
       },
     );
+
     if (!matchedCount) {
       throw new NotFoundException(
         `E 404: ${this.constructor.name
@@ -227,6 +232,42 @@ export class BaseRepository<Entity, MongoEntity>
     }
 
     return { n: matchedCount, nModified: modifiedCount };
+  }
+
+  async updateOneWithoutThrow(
+    identifier: FilterQuery<MongoEntity>,
+    data: Entity,
+    session?: ClientSession,
+  ): Promise<IRepositoryResponse> {
+    if (identifier._id) this._validateMongoID(identifier._id);
+
+    const { matchedCount: n } = await this.genericModel.updateOne(
+      identifier,
+      this.mapper.toPlainObject(data),
+      {
+        session,
+      },
+    );
+
+    return { n };
+  }
+
+  async updateMany(
+    identifier: FilterQuery<MongoEntity>,
+    data: UpdateQuery<Partial<MongoEntity>>,
+    session?: ClientSession,
+  ): Promise<IRepositoryResponse> {
+    if (identifier._id) this._validateMongoID(identifier._id);
+
+    const { matchedCount: n } = await this.genericModel.updateMany(
+      identifier,
+      data,
+      {
+        session,
+      },
+    );
+
+    return { n };
   }
 
   async delete(
@@ -292,27 +333,8 @@ export class BaseRepository<Entity, MongoEntity>
     return ref;
   }
 
-  private _validateMongoID(_id: string) {
+  private _validateMongoID(_id: Types.ObjectId) {
     if (!isValidObjectId(_id))
       throw new BadRequestException('E 400: ID NOT VALID');
-  }
-
-  async updateWithoutThrow(
-    identifier: FilterQuery<MongoEntity>,
-    data: UpdateQuery<Partial<MongoEntity>>,
-    session?: ClientSession,
-  ): Promise<IRepositoryResponse> {
-    if (identifier._id && typeof identifier._id === 'string')
-      this._validateMongoID(identifier._id);
-
-    const { matchedCount: n } = await this.genericModel.updateMany(
-      identifier,
-      data,
-      {
-        session,
-      },
-    );
-
-    return { n };
   }
 }

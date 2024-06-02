@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import { IdResponseDto } from 'src/core/base/http/id-response.dto';
 import { UserResponseDtoProps } from 'src/port/dto/user.response-dto.port';
 
@@ -16,11 +17,13 @@ export class UserResponseDto
   constructor(props: UserResponseDtoProps) {
     super(props._id);
 
+    this._id = props._id;
     this.user_id = props.user_id;
     this.user_name = props.user_name;
     this.level = props.level;
   }
 
+  _id: Types.ObjectId;
   user_id: string;
   user_name: string;
   level: string;

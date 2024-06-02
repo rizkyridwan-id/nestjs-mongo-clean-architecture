@@ -1,14 +1,9 @@
-export type MongoEntityProps<MongoEntity> = Omit<MongoEntity, '_id'>;
+import { Types } from 'mongoose';
+export type MongoEntityProps<MongoEntity> = Omit<MongoEntity, '_id'> & {
+  _id: Types.ObjectId;
+};
 
-export abstract class DbMapper<Entity, MongoEntity> {
-  constructor(private mongoEntityModel: new (...args: any[]) => MongoEntity) {}
-
-  protected abstract toMongoProps(
-    entity: Entity,
-  ): MongoEntityProps<MongoEntity>;
-
-  toMongoEntity(entity: Entity): MongoEntity {
-    const props = this.toMongoProps(entity);
-    return new this.mongoEntityModel(props);
-  }
+export interface DbMapper<Entity, MongoEntity> {
+  toPlainObject(entity: Entity): MongoEntityProps<MongoEntity>;
+  toDomain(raw: MongoEntity): Entity;
 }

@@ -55,7 +55,7 @@ export class CreateUser
 
       return new ResponseDto({ status: HttpStatus.CREATED, data: result });
     } catch (err) {
-      this.logger.error(err.message);
+      this.logger.error(err);
 
       throw new HttpException(
         { message: err.message || err },
@@ -83,10 +83,6 @@ export class CreateUser
         { level: 'SU' },
         'Level System Sudah Terdaftar.',
       );
-    return isSecretKeyValid
-      ? new UserLevel('SU')
-      : level
-        ? new UserLevel(level)
-        : new UserLevel('ADMIN');
+    return isSecretKeyValid ? new UserLevel('SU') : new UserLevel(level!);
   }
 }

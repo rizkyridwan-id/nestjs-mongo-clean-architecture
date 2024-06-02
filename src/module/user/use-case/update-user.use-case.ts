@@ -1,8 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
-import { UpdateUserRequestDto } from '../controller/dtos/update-user.request.dto';
-import { UserMongoEntity } from '../repository/user.mongo-entity';
-import { UserRepositoryPort } from '../../../port/repository/user.repository.port';
 import { InjectUserRepository } from '../repository/user.repository.provider';
 
 import { BaseUseCase, IUseCase } from 'src/core/base/module/use-case.base';
@@ -10,6 +12,8 @@ import { ResponseDto } from 'src/core/base/http/response.dto.base';
 
 import { PickUseCasePayload } from 'src/core/base/types/pick-use-case-payload.type';
 import { ObjectIdVO } from 'src/core/value-object/object-id.value-object';
+import { UpdateUserRequestDTO } from '../controller/dtos/update-user.request.dto';
+import { UserRepositoryPort } from 'src/port/repository/user.repository.port';
 
 type TUpdateUserPayload = PickUseCasePayload<
   UpdateUserRequestDto,
@@ -28,14 +32,19 @@ export class UpdateUser
 
   async execute({ data, _id }: TUpdateUserPayload): Promise<ResponseDto> {
     try {
-      const payload: Partial<UserMongoEntity> = data;
+      const userEntity = await this.userRepository.findById(
+        new ObjectIdVO(_id).valueConverted,
+      );
+      if (!userEntity) throw new NotFoundException('User not found.');
 
-      await this.userRepository.update(
-        { _id: new ObjectIdVO(_id).valueConverted },
-        payload,
+      userEntity.updateUser(data);
+
+      await this.userRepository.updateOne(
+        { _id: userEntity.propsCopy._id },
+        userEntity,
       );
     } catch (err) {
-      this.logger.error(err.message);
+      this.logger.error(err);
       if (err instanceof HttpException) throw err;
 
       throw new HttpException(err.message, 500);

@@ -1,6 +1,7 @@
 import { Entity } from 'src/core/base/domain/entity';
 import { HashService } from 'src/core/helper/module/hash.service';
 import { UserLevel } from './value-objects/user-level.value-object';
+import { Types } from 'mongoose';
 
 export interface UserProps {
   user_id: string;
@@ -10,11 +11,16 @@ export interface UserProps {
   input_by?: string;
 }
 
+export interface UpdateUserProps {
+  user_name: string;
+  level: string;
+}
+
 export class UserEntity extends Entity<UserProps> {
   private static hashUtil: HashService = new HashService();
 
-  constructor(props: UserProps) {
-    super(props);
+  constructor(props: UserProps, _id?: Types.ObjectId) {
+    super(props, _id);
   }
 
   static async create(props: UserProps) {
@@ -31,5 +37,10 @@ export class UserEntity extends Entity<UserProps> {
 
   static async comparePassword(rawPassword: string, hashedPassword: string) {
     return await this.hashUtil.compare(rawPassword, hashedPassword);
+  }
+
+  async updateUser(payload: UpdateUserProps) {
+    this.props.level = new UserLevel(payload.level);
+    this.props.user_name = payload.user_name;
   }
 }

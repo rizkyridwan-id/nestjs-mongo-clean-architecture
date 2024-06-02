@@ -63,6 +63,7 @@ export class CustomLogger implements LoggerService {
   private createConsoleTransport(): ConsoleTransportInstance {
     return new transports.Console({
       format: format.combine(
+        format.errors({ stack: true }),
         format.printf((info: any) => this.logFormatHandler(info)),
       ),
     });
@@ -102,9 +103,10 @@ export class CustomLogger implements LoggerService {
       `[${this.getContext(info)}]`,
     );
     const metaTrace: string = this.generateMetaTrace(info);
-    return `${timestamp}   ${levelTag} ${contextTag}${chalk.hex(
+    const msg = `${timestamp}   ${levelTag} ${contextTag}${chalk.hex(
       generateColor(info.level),
     )(metaTrace)} ${info.message}`;
+    return info.stack ? msg + '\n' + info.stack : msg;
   }
 
   private getContext(info: any) {

@@ -3,23 +3,24 @@ import {
   Document,
   FilterQuery,
   SortOrder,
+  Types,
   UpdateQuery,
 } from 'mongoose';
 import { IPaginationMeta } from '../interface/pagination-meta.interface';
 import { IRepositoryResponse } from '../interface/repository-response.interface';
 
 export interface BaseRepositoryPort<Entity, MongoEntity> {
-  findAll(session?: ClientSession): Promise<Array<MongoEntity>>;
+  findAll(session?: ClientSession): Promise<Entity[]>;
   findOne(
     identifier: FilterQuery<MongoEntity>,
     session?: ClientSession,
-  ): Promise<MongoEntity | undefined>;
+  ): Promise<Entity | undefined>;
 
   findOneOrThrow(
     identifier: FilterQuery<MongoEntity>,
     errorMessage?: string,
     session?: ClientSession,
-  ): Promise<MongoEntity>;
+  ): Promise<Entity>;
 
   findOneAndThrow(
     identifier: FilterQuery<MongoEntity>,
@@ -35,24 +36,24 @@ export interface BaseRepositoryPort<Entity, MongoEntity> {
   findOneLatest(
     identifier: FilterQuery<MongoEntity>,
     session?: ClientSession,
-  ): Promise<MongoEntity | undefined>;
+  ): Promise<Entity | undefined>;
   findById(
-    id: string,
+    id: Types.ObjectId,
     session?: ClientSession,
-  ): Promise<MongoEntity | undefined>;
+  ): Promise<Entity | undefined>;
   findBy(
     identifier: FilterQuery<MongoEntity>,
     session?: ClientSession,
-  ): Promise<Array<MongoEntity>>;
+  ): Promise<Entity[]>;
   findByPaginated(
     identifier: FilterQuery<MongoEntity>,
     paginationMeta: IPaginationMeta,
-  ): Promise<Array<MongoEntity>>;
+  ): Promise<Entity[]>;
   findByPaginateSorted(
     identifier: FilterQuery<MongoEntity>,
     paginationMeta: IPaginationMeta,
     sort: { [key: string]: SortOrder | { $meta: any } },
-  ): Promise<Array<MongoEntity>>;
+  ): Promise<Entity[]>;
   count(): Promise<number>;
   countBy(identifier: FilterQuery<MongoEntity>): Promise<number>;
   save(entity: Entity, session?: ClientSession): Promise<IRepositoryResponse>;
@@ -64,12 +65,17 @@ export interface BaseRepositoryPort<Entity, MongoEntity> {
     entity: Entity[],
     session?: ClientSession,
   ): Promise<IRepositoryResponse>;
-  update(
+  updateOne(
     identifier: FilterQuery<MongoEntity>,
-    data: UpdateQuery<Partial<MongoEntity>>,
+    data: Entity,
     session?: ClientSession,
   ): Promise<IRepositoryResponse>;
-  updateWithoutThrow(
+  updateOneWithoutThrow(
+    identifier: FilterQuery<MongoEntity>,
+    data: Entity,
+    session?: ClientSession,
+  ): Promise<IRepositoryResponse>;
+  updateMany(
     identifier: FilterQuery<MongoEntity>,
     data: UpdateQuery<Partial<MongoEntity>>,
     session?: ClientSession,
