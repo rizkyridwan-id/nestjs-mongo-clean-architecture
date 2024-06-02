@@ -12,7 +12,7 @@ import { DeleteUser } from '../use-case/delete-user.use-case';
 import { GetUser } from '../use-case/get-user.use-case';
 import { UpdateUser } from '../use-case/update-user.use-case';
 
-import { CraeteUserRequestDto } from './dtos/create-user.request.dto';
+import { CreateUserRequestDto } from './dtos/create-user.request.dto';
 import { UpdateUserRequestDto } from './dtos/update-user.request.dto';
 
 @Controller('v1/users')
@@ -26,7 +26,7 @@ export class UsersController {
 
   @SecurePost()
   async createUserHandler(
-    @Body() body: CraeteUserRequestDto,
+    @Body() body: CreateUserRequestDto,
     @AuthUser() user: JwtDecoded,
   ) {
     return await this.createUser.execute({ data: body, user });
